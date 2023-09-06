@@ -45,12 +45,20 @@ sc = StandardScaler()
 # sysbench_counts_list = normalize([sysbench_counts_list], norm="max")
 
 
-car_counts_list = normalize([car_counts_list], norm="l1")
-body_counts_list = normalize([body_counts_list], norm="l1")
-mariadb_counts_list = normalize([mariadb_counts_list], norm="l1")
-mysql_counts_list = normalize([mysql_counts_list], norm="l1")
-postgres_counts_list = normalize([postgres_counts_list], norm="l1")
-sysbench_counts_list = normalize([sysbench_counts_list], norm="l1")
+# car_counts_list = normalize([car_counts_list], norm="l1")
+# body_counts_list = normalize([body_counts_list], norm="l1")
+# mariadb_counts_list = normalize([mariadb_counts_list], norm="l1")
+# mysql_counts_list = normalize([mysql_counts_list], norm="l1")
+# postgres_counts_list = normalize([postgres_counts_list], norm="l1")
+# sysbench_counts_list = normalize([sysbench_counts_list], norm="l1")
+
+
+car_counts_list = normalize([car_counts_list], norm="l2")
+body_counts_list = normalize([body_counts_list], norm="l2")
+mariadb_counts_list = normalize([mariadb_counts_list], norm="l2")
+mysql_counts_list = normalize([mysql_counts_list], norm="l2")
+postgres_counts_list = normalize([postgres_counts_list], norm="l2")
+sysbench_counts_list = normalize([sysbench_counts_list], norm="l2")
 
 dict_of_names['car_counts_list'] = car_counts_list
 dict_of_names['body_counts_list'] = body_counts_list
