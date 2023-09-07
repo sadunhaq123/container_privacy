@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import Normalizer, normalize
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+from scipy.ndimage.filters import gaussian_filter1d
 
 
 non_zero_system_call_list = []
@@ -53,12 +56,23 @@ sc = StandardScaler()
 # sysbench_counts_list = normalize([sysbench_counts_list], norm="l1")
 
 
-car_counts_list = normalize([car_counts_list], norm="l2")
-body_counts_list = normalize([body_counts_list], norm="l2")
-mariadb_counts_list = normalize([mariadb_counts_list], norm="l2")
-mysql_counts_list = normalize([mysql_counts_list], norm="l2")
-postgres_counts_list = normalize([postgres_counts_list], norm="l2")
-sysbench_counts_list = normalize([sysbench_counts_list], norm="l2")
+car_counts_list = normalize([car_counts_list], norm="l2").tolist()[0]
+#print(type(car_counts_list))
+#print(car_counts_list)
+#print(car_counts_list.shape)
+body_counts_list = normalize([body_counts_list], norm="l2").tolist()[0]
+mariadb_counts_list = normalize([mariadb_counts_list], norm="l2").tolist()[0]
+mysql_counts_list = normalize([mysql_counts_list], norm="l2").tolist()[0]
+postgres_counts_list = normalize([postgres_counts_list], norm="l2").tolist()[0]
+sysbench_counts_list = normalize([sysbench_counts_list], norm="l2").tolist()[0]
+
+
+#normalized_df['car'] = pd.Series(car_counts_list)
+
+normalized_df = pd.DataFrame(list(zip(car_counts_list, body_counts_list, mariadb_counts_list, mysql_counts_list, postgres_counts_list, sysbench_counts_list)))
+#normalized_df.columns = ['car', 'body', 'mariadb', 'mysql', 'postgres', 'sysbench']
+#print(normalized_df)
+#normalized_df = pd.concat([normalized_df, df_individual_train], axis=0)
 
 dict_of_names['car_counts_list'] = car_counts_list
 dict_of_names['body_counts_list'] = body_counts_list
@@ -114,6 +128,19 @@ for i in list_2d:
 # print(dist_mariadb_mysql)
 # print(dist_mysql_postgres)
 # print(dist_postgres_sysbench)
+
+wcss = []
+list_x = []
+
+for i in range(1,10, 1):
+    km = KMeans(n_clusters=i)
+    km.fit_predict(normalized_df)
+    wcss.append(km.inertia_)
+    list_x.append(i)
+
+print(wcss)
+plt.plot(list_x, wcss)
+plt.show()
 
 exit()
 
