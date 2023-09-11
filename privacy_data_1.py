@@ -5,6 +5,7 @@ from sklearn.preprocessing import Normalizer, normalize
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from scipy.ndimage.filters import gaussian_filter1d
+import math
 
 
 non_zero_system_call_list = []
@@ -57,32 +58,42 @@ sc = StandardScaler()
 
 
 car_counts_list = normalize([car_counts_list], norm="l2").tolist()[0]
-#print(type(car_counts_list))
-#print(car_counts_list)
+#print(type(car_counts_list)).tolist()[0]
+
 #print(car_counts_list.shape)
 body_counts_list = normalize([body_counts_list], norm="l2").tolist()[0]
 mariadb_counts_list = normalize([mariadb_counts_list], norm="l2").tolist()[0]
 mysql_counts_list = normalize([mysql_counts_list], norm="l2").tolist()[0]
 postgres_counts_list = normalize([postgres_counts_list], norm="l2").tolist()[0]
 sysbench_counts_list = normalize([sysbench_counts_list], norm="l2").tolist()[0]
+print(car_counts_list)
+print(body_counts_list)
 
 
+#print(body_counts_list)
 #normalized_df['car'] = pd.Series(car_counts_list)
 
 normalized_df = pd.DataFrame(list(zip(car_counts_list, body_counts_list, mariadb_counts_list, mysql_counts_list, postgres_counts_list, sysbench_counts_list)))
 #normalized_df.columns = ['car', 'body', 'mariadb', 'mysql', 'postgres', 'sysbench']
+#normalized_df = normalized_df.T
 #print(normalized_df)
+#exit()
+#print(normalized_df.take([5]))
 #normalized_df = pd.concat([normalized_df, df_individual_train], axis=0)
 
-dict_of_names['car_counts_list'] = car_counts_list
-dict_of_names['body_counts_list'] = body_counts_list
-dict_of_names['mariadb_counts_list'] = mariadb_counts_list
-dict_of_names['mysql_counts_list'] = mysql_counts_list
-dict_of_names['postgres_counts_list'] = postgres_counts_list
-dict_of_names['sysbench_counts_list'] = sysbench_counts_list
+# print("CPNMV:",np.array([car_counts_list]))
+# print(np.array([car_counts_list]).shape)
+# exit()
+
+dict_of_names['car_counts_list'] = np.array([car_counts_list])
+dict_of_names['body_counts_list'] = np.array([body_counts_list])
+dict_of_names['mariadb_counts_list'] = np.array([mariadb_counts_list])
+dict_of_names['mysql_counts_list'] = np.array([mysql_counts_list])
+dict_of_names['postgres_counts_list'] = np.array([postgres_counts_list])
+dict_of_names['sysbench_counts_list'] = np.array([sysbench_counts_list])
 #car_count_list = np.reshape(car_count_list,(-1,1))
 #body_count_list = np.reshape(body_count_list,(-1,1))
-#print(car_count_list)
+#print("HELLO:",dict_of_names['car_counts_list'])
 
 #exit()
 
@@ -116,7 +127,7 @@ for i in list_2d:
     print(*i)
 
 
-
+#exit()
 # dist_car_body = [np.linalg.norm(x-y) for x,y in zip(car_count_list, body_count_list)]
 # dist_body_mariadb = [np.linalg.norm(x-y) for x,y in zip(body_count_list, mariadb_counts_list)]
 # dist_mariadb_mysql = [np.linalg.norm(x-y) for x,y in zip(mariadb_counts_list, mysql_counts_list)]
@@ -139,8 +150,96 @@ for i in range(1,10, 1):
     list_x.append(i)
 
 print(wcss)
-plt.plot(list_x, wcss)
-plt.show()
+print(list_x)
+#plt.plot(list_x, wcss)
+#plt.show()
+
+centroid_predictions = []
+
+#clusters make 2,3 or 4
+km = KMeans(n_clusters=4)
+fitting = km.fit(normalized_df)
+centroids_cluster = km.cluster_centers_
+predictions = km.predict(normalized_df)
+print(centroids_cluster)
+
+centre0 = centroids_cluster[0]
+centre1 = centroids_cluster[1]
+centre2 = centroids_cluster[2]
+centre3 = centroids_cluster[3]
+#print(centre1)
+
+centroid_labels = [centroids_cluster[i] for i in predictions]
+#print(centroid_labels[0])
+#print(type(centroid_labels))
+
+dict_clusters_and_numbers = {0:0,1:0,2:0,3:0,4:0}
+list_cluster_and_numbers = []
+
+list_of_actual_values =normalized_df.values.tolist()
+print(list_of_actual_values)
+#with actual labels and clusters
+for iterator1 in range(len(list_of_actual_values)):
+    values = list_of_actual_values[iterator1]
+    dist0 = float([np.linalg.norm(x - y) for x, y in zip(values, centre0)][0])
+    dist1 = float([np.linalg.norm(x - y) for x, y in zip(values, centre1)][0])
+    dist2 = float([np.linalg.norm(x - y) for x, y in zip(values, centre2)][0])
+    dist3 = float([np.linalg.norm(x - y) for x, y in zip(values, centre3)][0])
+    #print(values, centre0)
+    #print(dist0)
+    #print(type(dist0))
+    #exit()
+    #dist0 = format(dist0, ".2f")
+    #dist1 = format(dist1, ".2f")
+    #dist2 = format(dist2, ".2f")
+    #print(type(dist0))
+    if math.isclose(dist0, 0.0):
+        dict_clusters_and_numbers[0] +=1
+    elif math.isclose(dist1, 0.0):
+        dict_clusters_and_numbers[1] +=1
+    elif math.isclose(dist2, 0.0):
+        dict_clusters_and_numbers[2] +=1
+    elif math.isclose(dist3, 0.0):
+        dict_clusters_and_numbers[3] +=1
+    else:
+        dict_clusters_and_numbers[4] += 1
+
+
+print(dict_clusters_and_numbers)
+
+
+exit()
+#with predicted labels and clusters
+for iterator1 in range(len(centroid_labels)):
+    values = centroid_labels[iterator1]
+    dist0 = float([np.linalg.norm(x - y) for x, y in zip(values, centre0)][0])
+    dist1 = float([np.linalg.norm(x - y) for x, y in zip(values, centre1)][0])
+    dist2 = float([np.linalg.norm(x - y) for x, y in zip(values, centre2)][0])
+    dist3 = float([np.linalg.norm(x - y) for x, y in zip(values, centre3)][0])
+    #print(values, centre0)
+    print(dist0)
+    print(type(dist0))
+    #exit()
+    #dist0 = format(dist0, ".2f")
+    #dist1 = format(dist1, ".2f")
+    #dist2 = format(dist2, ".2f")
+    #print(type(dist0))
+    if math.isclose(dist0, 0.0):
+        dict_clusters_and_numbers[0] +=1
+    elif math.isclose(dist1, 0.0):
+        dict_clusters_and_numbers[1] +=1
+    elif math.isclose(dist2, 0.0):
+        dict_clusters_and_numbers[2] +=1
+    elif math.isclose(dist3, 0.0):
+        dict_clusters_and_numbers[3] +=1
+    else:
+        dict_clusters_and_numbers[4] += 1
+
+
+print(dict_clusters_and_numbers)
+
+
+
 
 exit()
 
