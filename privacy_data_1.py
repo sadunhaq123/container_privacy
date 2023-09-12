@@ -20,8 +20,8 @@ name_list = []
 distance_list = []
 dict_of_names = {}
 
-list1 = ['car', 'body', 'mariadb', 'mysql', 'postgres', 'sysbench']
-list2 = ['car', 'body', 'mariadb', 'mysql', 'postgres', 'sysbench']
+list1 = ['car', 'body', 'mariadb', 'mysql', 'postgres', 'mongo', 'redis', 'wordpress', 'caddy', 'httpd', 'sysbench']
+list2 = ['car', 'body', 'mariadb', 'mysql', 'postgres', 'mongo', 'redis', 'wordpress', 'caddy', 'httpd', 'sysbench']
 
 list_1d = []
 list_2d = []
@@ -34,6 +34,11 @@ body_counts_list      = df['body_count'].to_list()
 mariadb_counts_list  = df['mariadb_counts'].to_list()
 mysql_counts_list    = df['mysql_counts'].to_list()
 postgres_counts_list = df['postgres_counts'].to_list()
+mongo_counts_list = df['mongo_counts'].to_list()
+redis_counts_list = df['redis_counts'].to_list()
+wordpress_counts_list = df['wordpress_counts'].to_list()
+caddy_counts_list = df['caddy_counts'].to_list()
+httpd_counts_list = df['httpd_counts'].to_list()
 sysbench_counts_list = df['sysbench_counts'].to_list()
 
 
@@ -65,6 +70,11 @@ body_counts_list = normalize([body_counts_list], norm="l2").tolist()[0]
 mariadb_counts_list = normalize([mariadb_counts_list], norm="l2").tolist()[0]
 mysql_counts_list = normalize([mysql_counts_list], norm="l2").tolist()[0]
 postgres_counts_list = normalize([postgres_counts_list], norm="l2").tolist()[0]
+mongo_counts_list = normalize([mongo_counts_list], norm="l2").tolist()[0]
+redis_counts_list = normalize([redis_counts_list], norm="l2").tolist()[0]
+wordpress_counts_list = normalize([wordpress_counts_list], norm="l2").tolist()[0]
+caddy_counts_list = normalize([caddy_counts_list], norm="l2").tolist()[0]
+httpd_counts_list = normalize([httpd_counts_list], norm="l2").tolist()[0]
 sysbench_counts_list = normalize([sysbench_counts_list], norm="l2").tolist()[0]
 print(car_counts_list)
 print(body_counts_list)
@@ -73,7 +83,8 @@ print(body_counts_list)
 #print(body_counts_list)
 #normalized_df['car'] = pd.Series(car_counts_list)
 
-normalized_df = pd.DataFrame(list(zip(car_counts_list, body_counts_list, mariadb_counts_list, mysql_counts_list, postgres_counts_list, sysbench_counts_list)))
+normalized_df = pd.DataFrame(list(zip(car_counts_list, body_counts_list, mariadb_counts_list, mysql_counts_list, postgres_counts_list,
+                                      mongo_counts_list, redis_counts_list, wordpress_counts_list, caddy_counts_list, httpd_counts_list, sysbench_counts_list)))
 #normalized_df.columns = ['car', 'body', 'mariadb', 'mysql', 'postgres', 'sysbench']
 #normalized_df = normalized_df.T
 #print(normalized_df)
@@ -90,6 +101,11 @@ dict_of_names['body_counts_list'] = np.array([body_counts_list])
 dict_of_names['mariadb_counts_list'] = np.array([mariadb_counts_list])
 dict_of_names['mysql_counts_list'] = np.array([mysql_counts_list])
 dict_of_names['postgres_counts_list'] = np.array([postgres_counts_list])
+dict_of_names['mongo_counts_list'] = np.array([mongo_counts_list])
+dict_of_names['redis_counts_list'] = np.array([redis_counts_list])
+dict_of_names['wordpress_counts_list'] = np.array([wordpress_counts_list])
+dict_of_names['caddy_counts_list'] = np.array([caddy_counts_list])
+dict_of_names['httpd_counts_list'] = np.array([httpd_counts_list])
 dict_of_names['sysbench_counts_list'] = np.array([sysbench_counts_list])
 #car_count_list = np.reshape(car_count_list,(-1,1))
 #body_count_list = np.reshape(body_count_list,(-1,1))
@@ -127,7 +143,7 @@ for i in list_2d:
     print(*i)
 
 
-#exit()
+exit()
 # dist_car_body = [np.linalg.norm(x-y) for x,y in zip(car_count_list, body_count_list)]
 # dist_body_mariadb = [np.linalg.norm(x-y) for x,y in zip(body_count_list, mariadb_counts_list)]
 # dist_mariadb_mysql = [np.linalg.norm(x-y) for x,y in zip(mariadb_counts_list, mysql_counts_list)]
