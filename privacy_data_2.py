@@ -167,15 +167,15 @@ for i in range(1,10, 1):
 
 print(wcss)
 print(list_x)
-plt.plot(list_x, wcss)
-plt.show()
+#plt.plot(list_x, wcss)
+#plt.show()
 
 centroid_predictions = []
 
 #exit()
 
 #clusters make 4,5, 6 or 7
-km = KMeans(n_clusters=4)
+km = KMeans(n_clusters=6)
 fitting = km.fit(normalized_df)
 centroids_cluster = km.cluster_centers_
 predictions = km.predict(normalized_df)
@@ -187,6 +187,9 @@ centre0 = centroids_cluster[0]
 centre1 = centroids_cluster[1]
 centre2 = centroids_cluster[2]
 centre3 = centroids_cluster[3]
+centre4 = centroids_cluster[4]
+centre5 = centroids_cluster[5]
+#centre6 = centroids_cluster[6]
 #print(centre1)
 #print(type(centre1))
 
@@ -194,11 +197,11 @@ centroid_labels = [centroids_cluster[i] for i in predictions]
 #print(centroid_labels[0])
 #print(type(centroid_labels))
 
-dict_clusters_and_numbers = {0:0,1:0,2:0,3:0,4:0}
+dict_clusters_and_numbers = {0:0,1:0,2:0,3:0,4:0, 5:0, 6:0, 7:0, 8:0}
 list_cluster_and_numbers = []
 list_of_differences = []
 list_of_sums = []
-dict_of_differences = {0:[],1:[],2:[],3:[],4:[], 5:[]}
+dict_of_differences = {0:[],1:[],2:[],3:[],4:[], 5:[], 6:[], 7:[], 8:[]}
 
 list_of_actual_values =normalized_df.values.tolist()
 #print(list_of_actual_values)
@@ -215,17 +218,28 @@ for iterator1 in range(len(list_of_actual_values)):
         c1 = centre1[index]
         c2 = centre2[index]
         c3 = centre3[index]
+        c4 = centre4[index]
+        c5 = centre5[index]
+        #c6 = centre6[index]
+        #c7 = centre7[index]
+
         #c4 = centre4[index]
-        diff0 = c0 - c_value
+        diff0 = abs(c0 - c_value)
         #print("DIFF0:",diff0)
         #exit()
-        diff1 = c1 - c_value
-        diff2 = c2 - c_value
-        diff3 = c3 - c_value
+        diff1 = abs(c1 - c_value)
+        diff2 = abs(c2 - c_value)
+        diff3 = abs(c3 - c_value)
+        diff4 = abs(c4 - c_value)
+        diff5 = abs(c5 - c_value)
+        #diff6 = abs(c6 - c_value)
         dict_of_differences[0].append(diff0)
         dict_of_differences[1].append(diff1)
         dict_of_differences[2].append(diff2)
         dict_of_differences[3].append(diff3)
+        dict_of_differences[4].append(diff4)
+        dict_of_differences[5].append(diff5)
+        #dict_of_differences[6].append(diff6)
 
         #diff2 = c2 - c_value
         #list_of_differences.append(diff)
@@ -233,11 +247,17 @@ for iterator1 in range(len(list_of_actual_values)):
     sum1 = sum(dict_of_differences[1])
     sum2 = sum(dict_of_differences[2])
     sum3 = sum(dict_of_differences[3])
+    sum4 = sum(dict_of_differences[4])
+    sum5 = sum(dict_of_differences[5])
+    #sum6 = sum(dict_of_differences[6])
     list_of_sums.append(sum0)
     list_of_sums.append(sum1)
     list_of_sums.append(sum2)
     list_of_sums.append(sum3)
-    dict_of_differences = {0: [], 1: [], 2: [], 3: [], 4: [], 5: []}
+    list_of_sums.append(sum4)
+    list_of_sums.append(sum5)
+    #list_of_sums.append(sum6)
+    dict_of_differences = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8:[], 9:[]}
 
 
 
@@ -254,10 +274,14 @@ for iterator1 in range(len(list_of_actual_values)):
     #print(len(list_of_sums))
     #print(list_of_sums)
     #exit()
-    dist0 = float([np.linalg.norm(x - y) for x, y in zip(values, centre0)][0])
-    dist1 = float([np.linalg.norm(x - y) for x, y in zip(values, centre1)][0])
-    dist2 = float([np.linalg.norm(x - y) for x, y in zip(values, centre2)][0])
-    dist3 = float([np.linalg.norm(x - y) for x, y in zip(values, centre3)][0])
+
+    #Did before not needed now
+    # dist0 = float([np.linalg.norm(x - y) for x, y in zip(values, centre0)][0])
+    # dist1 = float([np.linalg.norm(x - y) for x, y in zip(values, centre1)][0])
+    # dist2 = float([np.linalg.norm(x - y) for x, y in zip(values, centre2)][0])
+    # dist3 = float([np.linalg.norm(x - y) for x, y in zip(values, centre3)][0])
+
+
     #print(values, centre0)
     #print(dist0)
     #print(type(dist0))
@@ -267,19 +291,26 @@ for iterator1 in range(len(list_of_actual_values)):
     #dist2 = format(dist2, ".2f")
     #print(type(dist0))
     #print("DISTS:",dist0, dist1, dist2, dist3)
-    for element in list_of_sums:
-        if math.isclose(element, 1.0):
-            dict_clusters_and_numbers[0] += 1
-        elif math.isclose(element, 1.0):
-            dict_clusters_and_numbers[1] += 1
-        elif math.isclose(element, 1.0):
-            dict_clusters_and_numbers[2] += 1
-        elif math.isclose(element, 1.0):
-            dict_clusters_and_numbers[3] += 1
-        else:
-            dict_clusters_and_numbers[4] += 1
 
 
+for element in list_of_sums:
+        #print(type(element))
+    if element >= 0.0 and element < 1.0:
+        dict_clusters_and_numbers[0] += 1
+        #print(dict_clusters_and_numbers)
+        #exit()
+    elif element >= 1.0 and element < 2.0:
+        dict_clusters_and_numbers[1] += 1
+    elif element >= 2.0 and element < 3.0:
+        dict_clusters_and_numbers[2] += 1
+    elif element >= 3.0 and element < 3.5:
+        dict_clusters_and_numbers[3] += 1
+    elif element >= 3.5 and element < 4.0:
+        dict_clusters_and_numbers[4] += 1
+    elif element >= 4.0 and element < 4.5:
+        dict_clusters_and_numbers[5] += 1
+    else:
+        dict_clusters_and_numbers[6] += 1
 print(len(list_of_sums))
 print(list_of_sums)
 print(dict_clusters_and_numbers)
