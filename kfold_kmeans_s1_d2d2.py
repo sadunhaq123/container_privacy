@@ -27,6 +27,9 @@ file1 = open('apps-sok.txt', 'r')
 
 train_path = 'train_autoencoder_with_timestamp/'
 test_path  = 'test_autoencoder_with_timestamp/'
+#train_path = 'train_test_supervised_with_timestamp/'
+#test_path  = 'train_test_supervised_with_timestamp/'
+
 file1 = open('apps-sok-second-part.txt', 'r')
 Lines1= file1.readlines()
 
@@ -93,8 +96,8 @@ for line in Lines1:
             exit()
         picklefile_train.close()
         df_train_all = pd.concat([df_train_all, df_individual_train], axis=0)
-        break
-    break
+        #break
+    #break
 
 for line in Lines2:
 
@@ -113,8 +116,8 @@ for line in Lines2:
         picklefile_test.close()
         df_test_all = pd.concat([df_test_all, df_individual_test], axis=0)
 
-        break
-    break
+        #break
+    #break
 
 # exit()
 # df_test_reversed = df_test_all[::-1]
@@ -177,12 +180,13 @@ print(type(scaled_train_data_x))
 
 #abc = AdaBoostClassifier(n_estimators=200)
 
-rfc = KMeans(n_clusters=2, verbose=True)
+rfc = KMeans(n_clusters=20)
+threshold=90
 
 predicted_list = []
 fprs, tprs, scores = [], [], []
 
-cv = StratifiedKFold(n_splits=4)
+cv = StratifiedKFold(n_splits=4, shuffle=True)
 
 X = np.concatenate((scaled_train_data_x, scaled_test_data_x), axis=0)
 y = np.concatenate((train_data_y.values.ravel(), test_data_y.values.ravel()), axis=0)
@@ -234,27 +238,6 @@ for (train, test), i in zip(cv.split(X, y), range(4)):
     # exit()
     # print("LABELS:", rfc.labels_)
     # print(set(rfc.labels_))
-    count0 = 0
-    count1 = 0
-    for new_iterator in range(len(rfc.labels_)):
-        if rfc.labels_[new_iterator] == 0:
-            count0 += 1
-        elif rfc.labels_[new_iterator] == 1:
-            count1 += 1
-    print("TRAINING Y")
-    print("COUNT0:", count0)
-    print("COUNT1:", count1)
-
-    count0 = 0
-    count1 = 0
-    for new_iterator in range(len(list_train_data_y)):
-        if list_train_data_y[new_iterator] == 0:
-            count0 += 1
-        elif list_train_data_y[new_iterator] == 1:
-            count1 += 1
-    print("ACTUAL Y")
-    print("COUNT0:", count0)
-    print("COUNT1:", count1)
 
     _, _, auc_score_train = compute_roc_auc_train(scaled_train_data_x, cv_train_data_y)
     fpr, tpr, auc_score = compute_roc_auc_test(scaled_test_data_x, cv_test_data_y)
@@ -266,141 +249,32 @@ for (train, test), i in zip(cv.split(X, y), range(4)):
 
     #y_pred = rfc.predict(scaled_test_data_x)
     #With train data
-    print("With train data")
-    y_pred = rfc.predict(scaled_train_data_x)
-    print(y_pred.shape)
 
 
-    y_pred_centres = rfc.cluster_centers_
-    # y_pred = rfc.predict(scaled_train_data_x)
-    # print("YPREDS:", set(y_pred))
-    # print(y_pred)
-    # exit()
-    print(scaled_train_data_x.shape)
-    print("C",y_pred_centres.shape)
-    print("CC",y_pred_centres[y_pred].shape)
-    #print(scaled_train_data_x)
+
     #exit()
-
-    a = np.array([1,2,3,4])
-    b = np.array([7,8])
-
-    # print(a[b])
-    # exit()
-
-    #print(y_pred_centres)
-    #print(y_pred_centres[y_pred])
-    #exit()
-
-    #dist = [np.linalg.norm(x - y) for x, y in zip(scaled_train_data_x[cv_train_data_y], y_pred_centres[y_pred])]
-    #print(y_pred_centres[0])
-    dist = []
-    min_20 = []
-    sum=0
-    #print(len(y_pred_centres))
-    #print(scaled_train_data_x)
-    #print(len(range(scaled_train_data_x)))
-    #exit()
-
-    scaled_train_data_x_np = scaled_train_data_x.to_numpy()
-    y_pred_centres_np = y_pred_centres
-    for iterator1 in range(len(scaled_train_data_x_np)):
-        for iterator2 in range(len(y_pred_centres_np)):
-            distance = [np.linalg.norm(x - y) for x, y in zip(scaled_train_data_x_np[iterator1], y_pred_centres_np[iterator2])]
-            #dist = [np.linalg.norm(scaled_train_data_x[0] - y_pred_centres[0])]
-            #print(len(dist))
-            #print(dist)
-            for iterator3 in range(len(distance)):
-                #print(distance[iterator3])
-                sum = sum + (distance[iterator3] * distance[iterator3])
-
-
-            #print(sum)
-            distance = sum**(1/556)
-            #print(distance)
-            #exit()
-            min_20.append(distance)
-            #print(iterator1, iterator2)
-        #print(iterator1)
-        #exit()
-        minimum_centroid_distance = min(min_20)
-        dist.append(minimum_centroid_distance)
-        min_20 = []
-        sum = 0
-
-
-
-
-    #print(dist)
-    #exit()
-
-
-    dist_y_pred = np.array(dist)
-    print(dist_y_pred.shape)
-    #exit()
-    #print()
-    print(dist)
-    print(len(dist))
-    print(np.percentile(dist, 90))
-    list_of_predictors = []
-    #exit()
-
-    begin_iteration = 0
-    for begin_iteration in range(len(dist_y_pred)):
-        if dist_y_pred[begin_iteration] >= np.percentile(dist, 90):
-            list_of_predictors.append(0)
-        else:
-            list_of_predictors.append(1)
-
-    dist_y_pred[dist >= np.percentile(dist, 90)] = 0
-    dist_y_pred[dist < np.percentile(dist, 90)] = 1
-
-    count0 = 0
-    count1 = 0
-    for new_iterator in range(len(list_train_data_y)):
-        if list_train_data_y[new_iterator] == 0:
-            count0 += 1
-        elif list_train_data_y[new_iterator] == 1:
-            count1 += 1
-    print("ACTUAL Y")
-    print("COUNT0:", count0)
-    print("COUNT1:", count1)
-
-    print("predicted {} count {}".format(np.sum(dist_y_pred), len(dist_y_pred)))
-
-    list_of_acuracy = []
-    list_of_precision = []
-    list_of_recall = []
-    list_of_f1 = []
-
-    list_of_predictors = y_pred
-    #list_of_thresholds = [1, 10, 20,30,40,50,60,70,80,90,99]
-    print(cv_train_data_y.shape, len(list_of_predictors), dist_y_pred.shape)
-
-    accuracy = metrics.accuracy_score(cv_train_data_y, list_of_predictors)
-    print(accuracy)
-    print(confusion_matrix(cv_train_data_y, list_of_predictors))
-    print(classification_report(cv_train_data_y, list_of_predictors))
-    print(accuracy_score(cv_train_data_y, list_of_predictors))
-
-    precision = precision_score(cv_train_data_y, list_of_predictors, average='macro')
-    print('Precision: %.3f', precision)
-    recall = recall_score(cv_train_data_y, list_of_predictors, average='macro')
-    print('Recall: %.3f', recall)
-    score = f1_score(cv_train_data_y, list_of_predictors, average='macro')
-    print('F-Measure: %.3f', score)
-
-
     #With test data
     print("With test data")
     y_pred = rfc.predict(scaled_test_data_x)
 
     y_pred_centres = rfc.cluster_centers_
-    # y_pred = rfc.predict(scaled_train_data_x)
-    # print("YPREDS:", set(y_pred))
-    # print(y_pred)
+    print("C", y_pred_centres.shape)
+    print("CC", y_pred_centres[y_pred].shape)
+    # print(scaled_train_data_x)
     # exit()
 
+    a = np.array([1, 2, 3, 4])
+    b = np.array([7, 8])
+
+    # print(a[b])
+    # exit()
+
+    # print(y_pred_centres)
+    # print(y_pred_centres[y_pred])
+    # exit()
+
+    # dist = [np.linalg.norm(x - y) for x, y in zip(scaled_train_data_x[cv_train_data_y], y_pred_centres[y_pred])]
+    # print(y_pred_centres[0])
     dist = []
     min_20 = []
     sum = 0
@@ -409,85 +283,137 @@ for (train, test), i in zip(cv.split(X, y), range(4)):
     # print(len(range(scaled_train_data_x)))
     # exit()
 
-    scaled_test_data_x_np = scaled_test_data_x.to_numpy()
-    y_pred_centres_np = y_pred_centres
-    for iterator1 in range(len(scaled_test_data_x_np)):
-        for iterator2 in range(len(y_pred_centres_np)):
-            distance = [np.linalg.norm(x - y) for x, y in
-                        zip(scaled_test_data_x_np[iterator1], y_pred_centres_np[iterator2])]
-            # dist = [np.linalg.norm(scaled_train_data_x[0] - y_pred_centres[0])]
-            # print(len(dist))
-            # print(dist)
-            for iterator3 in range(len(distance)):
-                # print(distance[iterator3])
-                sum = sum + (distance[iterator3] * distance[iterator3])
+    # scaled_train_data_x_np = scaled_train_data_x.to_numpy()
+    # y_pred_centres_np = y_pred_centres
+    # for iterator1 in range(len(scaled_train_data_x_np)):
+    #     for iterator2 in range(len(y_pred_centres_np)):
+    #         distance = [np.linalg.norm(x - y) for x, y in zip(scaled_train_data_x_np[iterator1], y_pred_centres_np[iterator2])]
+    #         #dist = [np.linalg.norm(scaled_train_data_x[0] - y_pred_centres[0])]
+    #         #print(len(dist))
+    #         #print(dist)
+    #         for iterator3 in range(len(distance)):
+    #             #print(distance[iterator3])
+    #             sum = sum + (distance[iterator3] * distance[iterator3])
+    #
+    #
+    #         #print(sum)
+    #         distance = sum**(1/556)
+    #         #print(distance)
+    #         #exit()
+    #         min_20.append(distance)
+    #         #print(iterator1, iterator2)
+    #     #print(iterator1)
+    #     #exit()
+    #     minimum_centroid_distance = min(min_20)
+    #     dist.append(minimum_centroid_distance)
+    #     min_20 = []
+    #     sum = 0
 
-            # print(sum)
-            distance = sum ** (1 / 556)
-            # print(distance)
-            # exit()
-            min_20.append(distance)
-            # print(iterator1, iterator2)
-        # print(iterator1)
-        # exit()
-        minimum_centroid_distance = min(min_20)
-        dist.append(minimum_centroid_distance)
-        min_20 = []
-        sum = 0
-
-    print(len(dist))
-    print(dist)
-    # exit()
     # print(dist)
+    # exit()
 
-    dist_y_pred = np.array(dist)
-    print(np.percentile(dist, 90))
-    list_of_predictors = []
+    #dist=[]
+    scaled_test_data_x_np = scaled_test_data_x.to_numpy()
+    dist2 = [np.linalg.norm(x - y) for x, y in zip(scaled_test_data_x_np, y_pred_centres[y_pred])]
+    dist2_y_pred = np.array(dist2)
+    #print(dist2_y_pred.shape)
+    # exit()
+    # print()
+    # print("HERE")
+    # print(dist2)
+    # print(len(dist2))
+    print(dist2_y_pred)
+    #threshold = 50
+    print(np.percentile(dist2, threshold))
+    print(np.percentile(dist2, 20))
+    print(np.percentile(dist2, 40))
+    print(np.percentile(dist2, 50))
+    print(np.percentile(dist2, 80))
+    print(np.percentile(dist2, 90))
+
+    list_of_predictors2 = []
+    # print((rfc.labels_.shape))
+    # c0 = 0
+    # c1 = 0
+    # for x in (rfc.labels_):
+    #     if x == 0:
+    #         c0 += 1
+    #     elif x == 1:
+    #         c1 += 1
+    #
+    # print("CO", c0)
+    # print("C1", c1)
+    # exit()
+
+    # dist_y_pred[dist >= np.percentile(dist, threshold)] = 1
+    # dist_y_pred[dist < np.percentile(dist, threshold)] = 0
+
+    # print(type(cv_test_data_y))
+    # print(cv_test_data_y.shape)
+    # print(type(dist2_y_pred))
+    # train_data_y_np = cv_train_data_y.to_numpy()
+    # print(type(train_data_y_np))
+    actual_anomaly = np.where(cv_test_data_y == 0)[0]
+    actual_benign = np.where(cv_test_data_y == 1)[0]
+    anomalies_indices = np.where(dist2_y_pred > threshold)[0]
+    normal_indices = np.where(dist2_y_pred <= threshold)[0]
+
+    # dist_y_pred[dist >= np.percentile(dist, threshold)] = 0
+    # dist_y_pred[dist < np.percentile(dist, threshold)] = 1
 
     begin_iteration = 0
-    for begin_iteration in range(len(dist_y_pred)):
-        if dist_y_pred[begin_iteration] >= np.percentile(dist, 90):
-            list_of_predictors.append(0)
+    list_of_predictors2=[]
+    x = 0
+    for begin_iteration in dist2_y_pred:
+        #print(begin_iteration)
+        if begin_iteration > threshold:
+            #print(x)
+            list_of_predictors2.append(0)
         else:
-            list_of_predictors.append(1)
+            list_of_predictors2.append(1)
+            # print(x)
+        x += 1
 
-    dist_y_pred[dist >= np.percentile(dist, 90)] = 0
-    dist_y_pred[dist < np.percentile(dist, 90)] = 1
+    list_of_predictors2 = np.array(list_of_predictors2)
+    #print(list_of_predictors2[1364:1372])
+    #print(cv_train_data_y[1364:1372])
+    list_of_predictors2 = list_of_predictors2.tolist()
 
-    count0 = 0
-    count1 = 0
-    for new_iterator in range(len(list_test_data_y)):
-        if list_test_data_y[new_iterator] == 0:
-            count0 += 1
-        elif list_test_data_y[new_iterator] == 1:
-            count1 += 1
-    print("ACTUAL Y")
-    print("COUNT0:", count0)
-    print("COUNT1:", count1)
+    # Print the results
+    # print("Anomaly Normal:", actual_anomaly)
+    # print("Benign Normal:", actual_benign)
+    # print("Anomaly Indices:", anomalies_indices)
+    # print("Benign Indices:", normal_indices)
 
-    print("predicted {} count {}".format(np.sum(dist_y_pred), len(dist_y_pred)))
+    #exit()
+
+    print("predicted {} count {}".format(np.sum(dist2_y_pred), len(dist2_y_pred)))
 
     list_of_acuracy = []
     list_of_precision = []
     list_of_recall = []
     list_of_f1 = []
-    list_of_predictors=[]
+
+    # list_of_predictors = y_pred
     # list_of_thresholds = [1, 10, 20,30,40,50,60,70,80,90,99]
+    #print(cv_train_data_y.shape, len(list_of_predictors), dist_y_pred.shape)
 
-    list_of_predictors = y_pred
-    accuracy = metrics.accuracy_score(cv_test_data_y, list_of_predictors)
+    #cv_test_data_y = cv_test_data_y.tolist()
+    #exit()
+    accuracy = metrics.accuracy_score(cv_test_data_y, list_of_predictors2)
     print(accuracy)
-    print(confusion_matrix(cv_test_data_y, list_of_predictors))
-    print(classification_report(cv_test_data_y, list_of_predictors))
-    print(accuracy_score(cv_test_data_y, list_of_predictors))
+    print(confusion_matrix(cv_test_data_y, list_of_predictors2))
+    print(classification_report(cv_test_data_y, list_of_predictors2))
+    print(accuracy_score(cv_test_data_y, list_of_predictors2))
 
-    precision = precision_score(cv_test_data_y, list_of_predictors, average='macro')
+    precision = precision_score(cv_test_data_y, list_of_predictors2, average='macro')
     print('Precision: %.3f', precision)
-    recall = recall_score(cv_test_data_y, list_of_predictors, average='macro')
+    recall = recall_score(cv_test_data_y, list_of_predictors2, average='macro')
     print('Recall: %.3f', recall)
-    score = f1_score(cv_test_data_y, list_of_predictors, average='macro')
+    score = f1_score(cv_test_data_y, list_of_predictors2, average='macro')
     print('F-Measure: %.3f', score)
-    break
+    #exit()
+    #break
 
 
 def plot_roc_curve_simple(fprs, tprs):
